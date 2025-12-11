@@ -103,7 +103,7 @@ class AudioRecordController extends Controller
             throw new ValidationException($model->errors);
         }
 
-        $dto = new StartRecordingDto($data['department'], $data['operator_name']);
+        $dto = new StartRecordingDto($model->department, $model->operator_name);
         $sessionId = $this->recordingService->start($dto);
 
         return [
@@ -152,7 +152,7 @@ class AudioRecordController extends Controller
             throw new ValidationException($model->errors);
         }
 
-        $dto = new StopRecordingDto($data['session_id'], $data['department'] ?? '', $data['operator_name'] ?? '', $data['audio_data']);
+        $dto = new StopRecordingDto($model->session_id, $model->department, $model->operator_name, $model->audio_data);
         $result = $this->recordingService->stop($dto);
 
         return [
