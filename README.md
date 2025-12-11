@@ -65,4 +65,4 @@ php yii cache:flush-all
 # 📚 Документация API
 После запуска сервис доступен по адресу: 👉 http://localhost:8000/swagger/doc
 # Доступы:
-API Key: secret-api-key-123 (передавать в заголовке X-Api-Key)# audio_recorder
+API Key: secret-api-key-123 (передавать в заголовке X-Api-Key)
