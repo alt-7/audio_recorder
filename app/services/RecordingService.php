@@ -50,7 +50,7 @@ readonly class RecordingService
         $tempFilePath = null;
         try {
             $tempFilePath = $this->storage->saveTempFile($dto->audioData);
-            $targetFilePath = $this->storage->prepareTargetFile($dto->department, $dto->operatorName);
+            $targetFilePath = $this->storage->prepareTargetFile($recording->department, $recording->operator_name);
             $meta = $this->processor->process($tempFilePath, $targetFilePath);
 
             $recording->file_path = $this->storage->getRelativeUrl($targetFilePath);
