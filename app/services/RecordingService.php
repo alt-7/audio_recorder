@@ -40,6 +40,10 @@ readonly class RecordingService
             throw new AudioException("Сессия записи не найдена: {$dto->sessionId}");
         }
 
+        if ($recording->status !== Recording::STATUS_RECORDING) {
+            throw new AudioException("Запись уже обработана или обрабатывается.");
+        }
+
         $recording->status = Recording::STATUS_PROCESSING;
         $this->repository->save($recording);
 
