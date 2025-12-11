@@ -11,9 +11,11 @@
    * Конвертация в MP3 (VBR High Quality).
 * **Безопасность:**
    * Rate Limiting (защита от DDOS).
-   * Валидация MIME-типов и имен файлов.
+   * Валидация MIME-типов, имен файлов, входных данных.
    * API Key Аутентификация.
-* **Документация:** Swagger / OpenAPI 3.0.
+   * Защита от SQL-инъекций
+   * Санитизация имен файлов и директорий
+* **Документация:** Swagger / OpenAPI.
 * **Тесты:** Unit и API (Codeception).
 
 ---
@@ -24,7 +26,7 @@
 * Docker & Docker Compose
 
 # Клонирование репозитория:
-git clone https://github.com/yourusername/task_management.git
+git clone https://github.com/alt-7/audio_recorder.git
 cd project
 
 # Создаем файл настроек из шаблона
@@ -32,6 +34,7 @@ cp .env.example .env
 
 # Собрать и запустить контейнеры
 docker compose up -d --build
+
 *При запуске скрипт `entrypoint.sh` автоматически:*
 * *Установит зависимости Composer*
 * *Выполнит миграции базы данных*
