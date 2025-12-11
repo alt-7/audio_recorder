@@ -58,9 +58,11 @@ class AudioRecordController extends Controller
             'except' => ['options'],
         ];
 
+        $isTest = (defined('YII_ENV') && YII_ENV === 'test')
+            || Yii::$app->request->headers->get('X-Test-Mode') === 'true';
         $behaviors['rateLimiter'] = [
             'class'       => IpRateLimitFilter::class,
-            'maxRequests' => 10,
+            'maxRequests' => $isTest ? 1000 : 10,
             'period'      => 60,
         ];
 

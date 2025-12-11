@@ -6,6 +6,7 @@ namespace tests\unit\services;
 
 use app\dto\StartRecordingDto;
 use app\dto\StopRecordingDto;
+use app\factories\RecordingFactory;
 use app\exceptions\AudioException;
 use app\interfaces\AudioProcessorInterface;
 use app\interfaces\RecordingRepositoryInterface;
@@ -23,6 +24,14 @@ class RecordingServiceTest extends Unit
      */
     public function testStartRecordingCreatesSession(): void
     {
+        $recordingStub = new Recording();
+        $recordingStub->session_id = 'uuid-123';
+        $recordingStub->status = Recording::STATUS_RECORDING;
+
+        $factoryMock = $this->makeEmpty(RecordingFactory::class, [
+            'create' => $recordingStub
+        ]);
+
         $repoMock = $this->makeEmpty(RecordingRepositoryInterface::class, [
             'save' => function (Recording $model) {
                 verify($model->status)->equals(Recording::STATUS_RECORDING);
@@ -32,13 +41,17 @@ class RecordingServiceTest extends Unit
         $storageMock = $this->makeEmpty(StorageInterface::class);
         $processorMock = $this->makeEmpty(AudioProcessorInterface::class);
 
-        $service = new RecordingService($repoMock, $storageMock, $processorMock);
+        $service = new RecordingService($factoryMock, $repoMock, $storageMock, $processorMock);
         $dto = new StartRecordingDto('sales', 'tester');
 
         $sessionId = $service->start($dto);
-        verify($sessionId)->notEmpty();
+        verify($sessionId)->equals('uuid-123');
     }
 
+    /**
+     * @throws AudioException
+     * @throws Throwable
+     */
     /**
      * @throws AudioException
      * @throws Throwable
@@ -48,7 +61,13 @@ class RecordingServiceTest extends Unit
         $sessionId = 'test-uuid';
         $fakeWebUrl = '/audio-records/sales/tester/final.mp3';
 
-        $recordingModel = new Recording(['session_id' => $sessionId, 'status' => 'recording']);
+        $factoryMock = $this->makeEmpty(RecordingFactory::class);
+        $recordingModel = new Recording([
+            'session_id'    => $sessionId,
+            'status'        => 'recording',
+            'department'    => 'sales',
+            'operator_name' => 'tester'
+        ]);
 
         $repoMock = $this->makeEmpty(RecordingRepositoryInterface::class, [
             'findBySessionId' => fn($id) => $recordingModel,
@@ -67,7 +86,8 @@ class RecordingServiceTest extends Unit
             'process' => fn($in, $out) => ['duration' => 120.5, 'file_size' => 102400]
         ]);
 
-        $service = new RecordingService($repoMock, $storageMock, $processorMock);
+        $service = new RecordingService($factoryMock, $repoMock, $storageMock, $processorMock);
+
         $dto = new StopRecordingDto($sessionId, 'sales', 'tester', 'base64_data');
 
         $result = $service->stop($dto);
@@ -80,6 +100,7 @@ class RecordingServiceTest extends Unit
      */
     public function testStopThrowsExceptionIfSessionNotFound(): void
     {
+        $factoryMock = $this->makeEmpty(RecordingFactory::class);
         $repoMock = $this->makeEmpty(RecordingRepositoryInterface::class, [
             'findBySessionId' => fn($id) => null
         ]);
@@ -87,7 +108,7 @@ class RecordingServiceTest extends Unit
         $storageMock = $this->makeEmpty(StorageInterface::class);
         $processorMock = $this->makeEmpty(AudioProcessorInterface::class);
 
-        $service = new RecordingService($repoMock, $storageMock, $processorMock);
+        $service = new RecordingService($factoryMock, $repoMock, $storageMock, $processorMock);
         $dto = new StopRecordingDto('wrong-id', 'sales', 'tester', 'data');
         $this->expectException(AudioException::class);
         $this->expectExceptionMessage('Сессия записи не найдена');
@@ -102,6 +123,7 @@ class RecordingServiceTest extends Unit
     {
         $sessionId = 'test-uuid';
         $recordingModel = new Recording(['session_id' => $sessionId, 'status' => 'recording']);
+        $factoryMock = $this->makeEmpty(RecordingFactory::class);
 
         $repoMock = $this->makeEmpty(RecordingRepositoryInterface::class, [
             'findBySessionId' => fn($id) => $recordingModel,
@@ -117,7 +139,7 @@ class RecordingServiceTest extends Unit
         ]);
 
         $processorMock = $this->makeEmpty(AudioProcessorInterface::class);
-        $service = new RecordingService($repoMock, $storageMock, $processorMock);
+        $service = new RecordingService($factoryMock, $repoMock, $storageMock, $processorMock);
         $dto = new StopRecordingDto($sessionId, 'sales', 'tester', 'bad_data');
 
         $this->expectException(AudioException::class);

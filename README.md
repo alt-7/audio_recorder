@@ -59,7 +59,7 @@ php yii user/init
 php yii swagger/generate
 
 # Очистить кеш
-php yii cache:flush-all
+php yii cache/flush-all
 
 
 # 📚 Документация API

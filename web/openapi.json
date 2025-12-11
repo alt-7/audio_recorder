@@ -179,10 +179,12 @@
                         "example": "uuid-session-id"
                     },
                     "department": {
+                        "description": "Название отдела",
                         "type": "string",
                         "example": "sales"
                     },
                     "operator_name": {
+                        "description": "Имя оператора",
                         "type": "string",
                         "example": "ivanov_ivan"
                     },
