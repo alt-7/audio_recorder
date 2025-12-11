@@ -1,0 +1,53 @@
+<?php
+
+declare(strict_types=1);
+
+namespace tests\unit\models;
+
+use app\models\User;
+use Codeception\Test\Unit;
+use tests\unit\fixtures\UserFixture;
+
+class UserTest extends Unit
+{
+    public function _fixtures(): array
+    {
+        return [
+            'users' => [
+                'class' => UserFixture::class,
+            ],
+        ];
+    }
+
+    public function testFindUserById(): void
+    {
+        verify($user = User::findIdentity(100))->notEmpty();
+        verify($user->username)->equals('admin');
+
+        verify(User::findIdentity(999))->empty();
+    }
+
+    public function testFindUserByAccessToken(): void
+    {
+        verify($user = User::findIdentityByAccessToken($_ENV['API_KEY_SECRET']))->notEmpty();
+        verify($user->username)->equals('admin');
+
+        verify(User::findIdentityByAccessToken('non-existing'))->empty();
+    }
+
+    public function testFindUserByUsername(): void
+    {
+        verify($user = User::findByUsername('admin'))->notEmpty();
+        verify(User::findByUsername('not-admin'))->empty();
+    }
+
+    public function testValidateUser(): void
+    {
+        $user = User::findByUsername('admin');
+        verify($user->validateAuthKey('test100key'))->notEmpty();
+        verify($user->validateAuthKey('test102key'))->empty();
+
+        verify($user->validatePassword('admin'))->notEmpty();
+        verify($user->validatePassword('123456'))->empty();
+    }
+}

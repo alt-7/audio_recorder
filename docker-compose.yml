@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  app:
+    env_file:
+      - .env
+    build: ./docker
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "8000:80"
+    networks:
+      - audio-net
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - audio-net
+
+networks:
+  audio-net:
+
+volumes:
+  db_data:

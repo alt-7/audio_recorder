@@ -1,0 +1,274 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Audio Recorder API",
+        "description": "API сервиса записи звука.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/",
+            "description": "Local Server"
+        }
+    ],
+    "paths": {
+        "/api/recording/start": {
+            "post": {
+                "tags": [
+                    "Recording"
+                ],
+                "summary": "Начать запись",
+                "operationId": "f830076894a1876e4ace2546559984bd",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StartRecordingDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Успешный старт",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "session_id": {
+                                            "type": "string",
+                                            "example": "uuid-session-id"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Запись начата"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/DefaultError"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/recording/stop": {
+            "post": {
+                "tags": [
+                    "Recording"
+                ],
+                "summary": "Остановить запись",
+                "operationId": "aa45ca4bfe13a53c76c5c82bb2edc288",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StopRecordingDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Запись сохранена",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "file_path": {
+                                            "type": "string",
+                                            "example": "/audio-records/sales/ivanov_ivan/2024-12-08/143022_ivanov_ivan.mp3"
+                                        },
+                                        "file_size": {
+                                            "type": "integer",
+                                            "example": 245678
+                                        },
+                                        "duration": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 125.5
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Запись сохранена"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/DefaultError"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "StartRecordingDto": {
+                "title": "Start Recording Request",
+                "description": "Данные для начала записи",
+                "required": [
+                    "department",
+                    "operator_name"
+                ],
+                "properties": {
+                    "department": {
+                        "description": "Название отдела",
+                        "type": "string",
+                        "example": "sales"
+                    },
+                    "operator_name": {
+                        "description": "Имя оператора",
+                        "type": "string",
+                        "example": "ivanov_ivan"
+                    }
+                },
+                "type": "object"
+            },
+            "StopRecordingDto": {
+                "title": "Stop Recording Request",
+                "description": "Данные для завершения записи",
+                "required": [
+                    "session_id",
+                    "department",
+                    "operator_name",
+                    "audio_data"
+                ],
+                "properties": {
+                    "session_id": {
+                        "description": "ID сессии",
+                        "type": "string",
+                        "example": "uuid-session-id"
+                    },
+                    "department": {
+                        "type": "string",
+                        "example": "sales"
+                    },
+                    "operator_name": {
+                        "type": "string",
+                        "example": "ivanov_ivan"
+                    },
+                    "audio_data": {
+                        "description": "Аудиофайл в формате Base64",
+                        "type": "string",
+                        "example": "base64_encoded_audio"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "responses": {
+            "DefaultError": {
+                "description": "Общая ошибка",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "properties": {
+                                "status": {
+                                    "type": "string",
+                                    "example": "error"
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "example": "Описание ошибки"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "Unauthorized": {
+                "description": "Ошибка доступа",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "properties": {
+                                "status": {
+                                    "type": "string",
+                                    "example": "error"
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "example": "Your request was made with invalid credentials."
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "ValidationError": {
+                "description": "Ошибка валидации полей",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "properties": {
+                                "status": {
+                                    "type": "string",
+                                    "example": "error"
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "example": "Ошибка валидации данных"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "ApiKeyAuth": {
+                "type": "apiKey",
+                "name": "X-Api-Key",
+                "in": "header"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Recording",
+            "description": "API Записи звука"
+        }
+    ]
+}
